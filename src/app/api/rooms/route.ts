@@ -3,14 +3,13 @@ import { NextResponse } from 'next/server';
 import { Room, BookingRequest, BookingResponse } from '@/lib/types';
 import { findOptimalRooms } from '@/lib/algorithm';
 
-// --- IN-MEMORY DATABASE ---
-// In a real app, use Redis/Postgres. This persists while lambda is warm.
+//IN-MEMORY DATABASE
 let HOTEL_STATE: Room[] = [];
 
 const initHotel = () => {
   if (HOTEL_STATE.length > 0) return;
   for (let f = 1; f <= 10; f++) {
-    const count = f === 10 ? 7 : 10; // Floor 10 has 7 rooms
+    const count = f === 10 ? 7 : 10; 
     for (let i = 1; i <= count; i++) {
       HOTEL_STATE.push({
         id: f === 10 ? 1000 + i : f * 100 + i,
@@ -71,5 +70,4 @@ export async function POST(req: Request) {
       message: `Successfully booked ${count} rooms.`
     });
   }
-  // ...
 }

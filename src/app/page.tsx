@@ -67,7 +67,7 @@ export default function Home() {
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* --- LEFT COLUMN: CONTROLS & INFO --- */}
+        {/*LEFT COLUMN: CONTROLS & INFO*/}
         <div className="lg:col-span-4 space-y-6">
           
           {/* CONTROL CARD */}
@@ -151,7 +151,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* --- RIGHT COLUMN: VISUALIZATION --- */}
+        {/*RIGHT COLUMN: VISUALIZATION*/}
         <div className="lg:col-span-8">
           <div className="bg-white p-6 rounded-2xl shadow-xl border border-slate-200 overflow-x-auto">
             <div className="flex flex-row gap-6 min-w-[600px]">

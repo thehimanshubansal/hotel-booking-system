@@ -1,15 +1,15 @@
 // src/lib/types.ts
 
 export type Room = {
-  id: number;       // e.g., 101, 205, 1001
-  floor: number;    // 1-10
-  index: number;    // 1-10 (Distance from lift)
+  id: number;      
+  floor: number;   
+  index: number;   
   isBooked: boolean;
 };
 
 export type BookingRequest = {
   action: 'book' | 'reset' | 'random';
-  count?: number; // Only needed for 'book'
+  count?: number; 
 };
 
 export type BookingResponse = {
@@ -17,5 +17,5 @@ export type BookingResponse = {
   message?: string;
   bookedRoomIds?: number[];
   travelTime?: number;
-  rooms: Room[]; // Always return updated state
+  rooms: Room[];
 };
