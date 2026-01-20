@@ -58,8 +58,9 @@ This system avoids brute-force solutions ($O(N!)$) in favor of a hybrid heuristi
 
 
 ## 🤝 Contribution
+Thank you for considering contributing to this project! Please star this repo.
+
 Please run the linter before pushing changes:
-Thank you for considering contributing to [Project Name]!
 
 ```bash
 npm run lint
