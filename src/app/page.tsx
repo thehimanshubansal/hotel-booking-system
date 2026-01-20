@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Room, BookingResponse } from "@/lib/types";
+import { motion } from "framer-motion";
 
 export default function Home() {
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -13,7 +14,8 @@ export default function Home() {
   useEffect(() => {
     fetch("/api/rooms")
       .then((res) => res.json())
-      .then((data) => { if (data.rooms) setRooms(data.rooms); });
+      .then((data) => { if (data.rooms) setRooms(data.rooms); })
+      .catch((_) => console.error("Failed to fetch"));
   }, []);
 
   const handleAction = async (action: 'book' | 'reset' | 'random') => {
@@ -38,7 +40,7 @@ export default function Home() {
         if (action === 'book' && data.bookedRoomIds) {
           setLastBooked(data.bookedRoomIds);
           setLastCost(data.travelTime || 0);
-          setMsg(`Booked rooms: ${data.bookedRoomIds.join(", ")}`);
+          setMsg(`Success! Booked rooms: ${data.bookedRoomIds.join(", ")}`);
         } else if (action === 'reset') {
           setLastBooked([]);
           setMsg("System Reset.");
@@ -49,7 +51,7 @@ export default function Home() {
       } else {
         setMsg(data.message || "Error occurred");
       }
-    } catch (e) {
+    } catch (_) { 
       setMsg("Network error");
     } finally {
       setLoading(false);
@@ -67,7 +69,7 @@ export default function Home() {
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/*LEFT COLUMN: CONTROLS & INFO*/}
+        {/* --- LEFT COLUMN: CONTROLS & INFO --- */}
         <div className="lg:col-span-4 space-y-6">
           
           {/* CONTROL CARD */}
@@ -75,18 +77,21 @@ export default function Home() {
             <h2 className="text-lg font-bold text-slate-700 mb-4">Reservation Controls</h2>
             
             <div className="mb-6">
-              <label className="block text-xs font-bold uppercase text-slate-400 mb-2">Rooms to Book (Max 5)</label>
+              <label htmlFor="roomInput" className="block text-xs font-bold uppercase text-slate-400 mb-2">Rooms to Book (Max 5)</label>
               <div className="flex gap-2">
                 <input 
+                  id="roomInput"
                   type="number" min="1" max="5" 
                   value={inputVal}
                   onChange={(e) => setInputVal(e.target.value)}
                   className="border-2 border-slate-200 rounded-lg px-4 py-2 w-full focus:border-indigo-500 focus:outline-none font-bold text-lg"
+                  aria-label="Number of rooms to book"
                 />
                 <button 
                   onClick={() => handleAction('book')}
                   disabled={loading || !inputVal}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg transition-all shadow-md w-full disabled:opacity-50"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg transition-all shadow-md w-full disabled:opacity-50 focus:ring-4 focus:ring-indigo-300 outline-none"
+                  aria-label="Book Rooms"
                 >
                   {loading ? "..." : "Book"}
                 </button>
@@ -94,29 +99,43 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <button onClick={() => handleAction('random')} className="bg-indigo-50 text-indigo-700 font-semibold hover:bg-indigo-100 px-4 py-3 rounded-lg transition">
+              <button 
+                onClick={() => handleAction('random')} 
+                className="bg-indigo-50 text-indigo-700 font-semibold hover:bg-indigo-100 px-4 py-3 rounded-lg transition focus:ring-2 focus:ring-indigo-300 outline-none"
+                aria-label="Generate Random Occupancy"
+              >
                 Randomize
               </button>
-              <button onClick={() => handleAction('reset')} className="bg-red-50 text-red-600 font-semibold hover:bg-red-100 px-4 py-3 rounded-lg transition">
+              <button 
+                onClick={() => handleAction('reset')} 
+                className="bg-red-50 text-red-600 font-semibold hover:bg-red-100 px-4 py-3 rounded-lg transition focus:ring-2 focus:ring-red-300 outline-none"
+                aria-label="Reset All Bookings"
+              >
                 Reset All
               </button>
             </div>
           </div>
 
-          {/* LAST BOOKING INFO / VERIFICATION */}
-          {msg && (
-            <div className={`p-5 rounded-2xl border-l-4 shadow-md ${msg.includes("Error") ? "bg-red-50 border-red-500" : "bg-green-50 border-green-500"}`}>
-              <h3 className="font-bold text-gray-800 mb-1">{msg.includes("Error") ? "Error" : "Booking Status"}</h3>
-              <p className="text-sm text-gray-600 mb-2">{msg}</p>
-              
-              {lastCost !== null && (
-                <div className="mt-3 pt-3 border-t border-green-200 flex justify-between items-center">
-                  <span className="text-xs font-bold uppercase text-green-700">Total Travel Time</span>
-                  <span className="text-xl font-bold text-green-800">{lastCost} <span className="text-sm font-medium">mins</span></span>
-                </div>
-              )}
-            </div>
-          )}
+          {/* STATUS INFO (ARIA-LIVE REGION) */}
+          <div 
+            className="min-h-[60px]" 
+            role="status" 
+            aria-live="polite"
+          >
+            {msg && (
+              <div className={`p-5 rounded-2xl border-l-4 shadow-md ${msg.includes("Error") ? "bg-red-50 border-red-500" : "bg-green-50 border-green-500"}`}>
+                <h3 className="font-bold text-gray-800 mb-1">{msg.includes("Error") ? "Error" : "Booking Status"}</h3>
+                <p className="text-sm text-gray-600 mb-2">{msg}</p>
+                
+                {lastCost !== null && (
+                  <div className="mt-3 pt-3 border-t border-green-200 flex justify-between items-center">
+                    <span className="text-xs font-bold uppercase text-green-700">Total Travel Time</span>
+                    <span className="text-xl font-bold text-green-800">{lastCost} <span className="text-sm font-medium">mins</span></span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* RULES CARD */}
           <div className="bg-slate-800 text-slate-200 p-6 rounded-2xl shadow-lg">
@@ -151,7 +170,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/*RIGHT COLUMN: VISUALIZATION*/}
+        {/* --- RIGHT COLUMN: VISUALIZATION --- */}
         <div className="lg:col-span-8">
           <div className="bg-white p-6 rounded-2xl shadow-xl border border-slate-200 overflow-x-auto">
             <div className="flex flex-row gap-6 min-w-[600px]">
@@ -161,27 +180,53 @@ export default function Home() {
               </div>
 
               {/* GRID */}
-              <div className="flex flex-col-reverse gap-3 w-full">
+              <div 
+                className="flex flex-col-reverse gap-3 w-full" 
+                role="grid" 
+                aria-label="Hotel Rooms Grid"
+              >
                 {Array.from({ length: 10 }, (_, i) => i + 1).map(floorNum => (
-                  <div key={floorNum} className="flex items-center gap-4">
+                  <div key={floorNum} className="flex items-center gap-4" role="row">
                     <span className="w-8 text-right text-xs font-bold text-slate-400 font-mono shrink-0">F{floorNum}</span>
                     <div className="flex gap-2">
                       {rooms.filter(r => r.floor === floorNum).map(room => {
                         const isJustBooked = lastBooked.includes(room.id);
+                        const isBooked = room.isBooked;
+
                         return (
-                          <div 
+                          <motion.div 
                             key={room.id}
-                            className={`
-                              w-10 h-10 flex items-center justify-center text-[10px] font-bold rounded-md border-2 transition-all duration-500
-                              ${isJustBooked 
-                                ? "bg-indigo-600 border-indigo-600 text-white scale-110 shadow-lg z-10 ring-2 ring-indigo-200" 
-                                : room.isBooked 
-                                  ? "bg-red-100 border-red-200 text-red-400" 
-                                  : "bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100"}
-                            `}
+                            role="gridcell"
+                            tabIndex={0}
+                            aria-label={`Room ${room.id}, ${isBooked ? "Occupied" : "Available"}`}
+                            
+                            // ANIMATION PROPERTIES
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ 
+                              scale: isJustBooked ? 1.15 : 1,
+                              opacity: 1,
+                              backgroundColor: isJustBooked 
+                                ? "#4f46e5" // Indigo-600
+                                : isBooked 
+                                  ? "#fee2e2" // Red-100
+                                  : "#ecfdf5", // Emerald-50
+                              borderColor: isJustBooked 
+                                ? "#4338ca" // Indigo-700
+                                : isBooked 
+                                  ? "#fecaca" // Red-200
+                                  : "#a7f3d0", // Emerald-200
+                              color: isJustBooked 
+                                ? "#ffffff" 
+                                : isBooked 
+                                  ? "#f87171" 
+                                  : "#047857"
+                            }}
+                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                            
+                            className="w-10 h-10 flex items-center justify-center text-[10px] font-bold rounded-md border-2 cursor-default outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                           >
                             {room.id}
-                          </div>
+                          </motion.div>
                         )
                       })}
                     </div>
@@ -191,7 +236,7 @@ export default function Home() {
             </div>
             
             {/* LEGEND */}
-            <div className="flex justify-center gap-8 mt-8 border-t border-slate-100 pt-4">
+            <div className="flex justify-center gap-8 mt-8 border-t border-slate-100 pt-4" aria-hidden="true">
               <div className="flex items-center gap-2 text-sm font-medium text-slate-600">
                 <div className="w-4 h-4 bg-emerald-50 border border-emerald-200 rounded"></div> Available
               </div>
