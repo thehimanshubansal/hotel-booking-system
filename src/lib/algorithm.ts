@@ -55,7 +55,7 @@ export function findOptimalRooms(availableRooms: Room[], required: number): { ro
       const verticalCost = (fEnd - fStart) * VERTICAL_TIME_PER_FLOOR;
       if (verticalCost >= minCost) continue;
 
-      let candidates: Room[] = [];
+      const candidates: Room[] = [];
       for (let f = fStart; f <= fEnd; f++) {
         if (floors[f]) candidates.push(...floors[f]);
       }
