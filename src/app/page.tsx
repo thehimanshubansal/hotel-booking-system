@@ -51,7 +51,7 @@ export default function Home() {
       } else {
         setMsg(data.message || "Error occurred");
       }
-    } catch (_) { 
+    } catch (_) {
       setMsg("Network error");
     } finally {
       setLoading(false);
