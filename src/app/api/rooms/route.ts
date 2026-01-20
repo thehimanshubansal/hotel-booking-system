@@ -1,10 +1,10 @@
 // src/app/api/rooms/route.ts
 import { NextResponse } from 'next/server';
-import { Room, BookingRequest, BookingResponse } from '@/lib/types';
+import { Room, BookingRequest } from '@/lib/types';
 import { findOptimalRooms } from '@/lib/algorithm';
 
 //IN-MEMORY DATABASE
-let HOTEL_STATE: Room[] = [];
+const HOTEL_STATE: Room[] = [];
 
 const initHotel = () => {
   if (HOTEL_STATE.length > 0) return;
